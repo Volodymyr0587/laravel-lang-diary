@@ -11,7 +11,7 @@ class LanguagePolicy
     /**
      * Determine whether the user can edit model.
      */
-    public function edit(User $user, Language $language): bool
+    public function editLanguage(User $user, Language $language): bool
     {
         return $language->user->is($user);
     }

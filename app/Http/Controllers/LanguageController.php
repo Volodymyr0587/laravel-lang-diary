@@ -52,7 +52,7 @@ class LanguageController extends Controller
      */
     public function show(Language $language)
     {
-        Gate::authorize('edit', $language);
+        Gate::authorize('editLanguage', $language);
         return view('languages.show', compact('language'));
     }
 
@@ -69,7 +69,7 @@ class LanguageController extends Controller
      */
     public function update(Request $request, Language $language)
     {
-        Gate::authorize('edit', $language);
+        Gate::authorize('editLanguage', $language);
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -85,7 +85,7 @@ class LanguageController extends Controller
      */
     public function destroy(Language $language)
     {
-        Gate::authorize('edit', $language);
+        Gate::authorize('editLanguage', $language);
 
         $language->delete();
 
