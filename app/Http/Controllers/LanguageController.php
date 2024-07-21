@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class LanguageController extends Controller
 {
@@ -12,7 +13,10 @@ class LanguageController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+
+        $languages = $user->languages()->get();
+        return view('languages.index', compact('languages'));
     }
 
     /**
@@ -20,7 +24,7 @@ class LanguageController extends Controller
      */
     public function create()
     {
-        //
+        return view('languages.create');
     }
 
     /**
@@ -28,7 +32,19 @@ class LanguageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = auth()->user();
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $language = new Language($data);
+
+        $language->user()->associate($user);
+
+        $language->save();
+
+        return redirect()->route('languages.index')->with('success', 'Language created successfuly');
     }
 
     /**
@@ -36,7 +52,8 @@ class LanguageController extends Controller
      */
     public function show(Language $language)
     {
-        //
+        Gate::authorize('edit', $language);
+        return view('languages.show', compact('language'));
     }
 
     /**
@@ -44,7 +61,7 @@ class LanguageController extends Controller
      */
     public function edit(Language $language)
     {
-        //
+        return view('languages.edit', compact('language'));
     }
 
     /**
@@ -52,7 +69,15 @@ class LanguageController extends Controller
      */
     public function update(Request $request, Language $language)
     {
-        //
+        Gate::authorize('edit', $language);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $language->update($data);
+
+        return redirect()->route('languages.index')->with('success', 'Language updated successfully');
     }
 
     /**
@@ -60,6 +85,10 @@ class LanguageController extends Controller
      */
     public function destroy(Language $language)
     {
-        //
+        Gate::authorize('edit', $language);
+
+        $language->delete();
+
+        return redirect()->route('languages.index')->with('success', 'Language deleted successfully');
     }
 }
