@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Word::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Phrase::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Language::class)->constrained()->cascadeOnDelete();
+            $table->string('translation');
             $table->timestamps();
         });
     }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Word;
+use App\Models\Translation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WordController extends Controller
 {
@@ -12,7 +14,8 @@ class WordController extends Controller
      */
     public function index()
     {
-        //
+        $words = auth()->user()->words;
+        return view('words.index', compact('words'));
     }
 
     /**
@@ -20,7 +23,8 @@ class WordController extends Controller
      */
     public function create()
     {
-        //
+        $languages = auth()->user()->languages;
+        return view('words.create', compact('languages'));
     }
 
     /**
@@ -28,7 +32,28 @@ class WordController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'word' => 'required|string|max:255',
+            'translation' => 'required|string|max:255',
+            'translation_language_id' => 'required|exists:languages,id',
+        ]);
+
+        $word = new Word([
+            'word' => $data['word'],
+            'user_id' => auth()->id(),
+        ]);
+
+        $word->save();
+
+        $translation = new Translation([
+            'word_id' => $word->id,
+            'language_id' => $data['translation_language_id'],
+            'translation' => $data['translation'],
+        ]);
+
+        $translation->save();
+
+        return redirect()->route('words.index')->with('success', 'Word and translation created successfully');
     }
 
     /**
@@ -36,7 +61,11 @@ class WordController extends Controller
      */
     public function show(Word $word)
     {
-        //
+        Gate::authorize('editWord', $word);
+
+        $translations = $word->translations()->with('language')->get();
+
+        return view('words.show', compact('word', 'translations'));
     }
 
     /**
@@ -44,7 +73,11 @@ class WordController extends Controller
      */
     public function edit(Word $word)
     {
-        //
+        Gate::authorize('editWord', $word);
+        $languages = auth()->user()->languages;
+        $translation = $word->translations->first();
+
+        return view('words.edit', compact('word', 'languages', 'translation'));
     }
 
     /**
@@ -52,14 +85,45 @@ class WordController extends Controller
      */
     public function update(Request $request, Word $word)
     {
-        //
+        $data = $request->validate([
+            'word' => 'required|string|max:255',
+            'translations' => 'nullable|array',
+            'translations.*.translation' => 'required|string|max:255',
+            'translations.*.language_id' => 'required|exists:languages,id',
+        ]);
+
+        // Оновлення слова
+        $word->update([
+            'word' => $data['word'],
+        ]);
+
+        // Видалення старих перекладів
+        $word->translations()->delete();
+
+        // Додавання нових перекладів
+        if (isset($data['translations'])) {
+            foreach ($data['translations'] as $translationData) {
+                Translation::create([
+                    'word_id' => $word->id,
+                    'language_id' => $translationData['language_id'],
+                    'translation' => $translationData['translation'],
+                ]);
+            }
+        }
+
+        return redirect()->route('words.index')->with('success', 'Word and translations updated successfully');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Word $word)
     {
-        //
+        Gate::authorize('editWord', $word);
+
+        $word->delete();
+
+        return redirect()->route('words.index')->with('success', 'Word deleted successfully');
     }
 }
