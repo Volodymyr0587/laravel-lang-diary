@@ -9,144 +9,140 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{-- <form method="POST" action="{{ route('words.update', $word) }}">
+
+                    {{-- <form action="{{ route('words.update', $word->id) }}" method="POST">
                         @csrf
                         @method('PUT')
+                        <div class="space-y-12">
+                            <div class="border-b border-gray-900/10 pb-12">
+                                <h2 class="text-base font-semibold leading-7 text-gray-900">Word</h2>
+                                <p class="mt-1 text-sm leading-6 text-gray-600">Here You can edit Word and Translation for it</p>
 
-                        <div class="mb-4">
-                            <label for="word" class="block text-gray-700">Word</label>
-                            <input type="text" id="word" name="word" value="{{ old('word', $word->word) }}" class="form-input mt-1 block w-full" required>
+                                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                    <div class="sm:col-span-4">
+                                        <label for="word" class="block text-sm font-medium leading-6 text-gray-900">Word</label>
+                                        <div class="mt-2">
+                                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+
+                                                <input type="text" name="word" id="word" value="{{ $word->word }}" autocomplete="word"
+                                                    class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                    placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="sm:col-span-4">
+                                        <label for="translation" class="block text-sm font-medium leading-6 text-gray-900">Translation</label>
+                                        <div class="mt-2">
+                                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+
+                                                <input type="text" name="translation" id="translation" value="{{ $word->translations }}" autocomplete="translation"
+                                                    class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                    placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="sm:col-span-4">
+                                        <label for="translation_language_id" class="block text-sm font-medium leading-6 text-gray-900">Translation Language</label>
+                                        <div class="mt-2">
+                                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+
+                                                <select type="text" name="translation_language_id" id="translation_language_id"
+                                                    class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                >
+                                                @foreach($languages as $language)
+                                                    <option value="{{ $language->id }}" {{ $language->id == $word->translation->language_id ? 'selected' : '' }}>{{ $language->name }}</option>
+                                                @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <h3 class="text-xl font-semibold mb-2">Translations:</h3>
-
-                        @foreach ($word->translations as $index => $translation)
-                            <div class="mb-4">
-                                <label for="translations[{{ $index }}][translation]" class="block text-gray-700">Translation</label>
-                                <input type="text" id="translations[{{ $index }}][translation]" name="translations[{{ $index }}][translation]" value="{{ old('translations.' . $index . '.translation', $translation->translation) }}" class="form-input mt-1 block w-full" required>
-
-                                <label for="translations[{{ $index }}][language_id]" class="block text-gray-700 mt-2">Language</label>
-                                <select id="translations[{{ $index }}][language_id]" name="translations[{{ $index }}][language_id]" class="form-select mt-1 block w-full" required>
-                                    @foreach ($languages as $language)
-                                        <option value="{{ $language->id }}" {{ $language->id == $translation->language_id ? 'selected' : '' }}>
-                                            {{ $language->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endforeach
-
-                        <div class="mb-4">
-                            <button type="submit" class="btn btn-primary">Update Word</button>
+                        <div class="mt-6 flex items-center justify-end gap-x-6">
+                            <a href="{{ route('words.index') }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                            <button type="submit"
+                                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
                         </div>
                     </form> --}}
 
-                    <form method="POST" action="{{ route('words.update', $word) }}">
+                    <form action="{{ route('words.update', $word) }}" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-4">
-                            <label for="word" class="block text-gray-700">Word</label>
-                            <input type="text" id="word" name="word" value="{{ old('word', $word->word) }}" class="form-input mt-1 block w-full" required>
-                        </div>
+                        <div class="space-y-12">
+                            <div class="border-b border-gray-900/10 pb-12">
+                                <h2 class="text-base font-semibold leading-7 text-gray-900">Edit Word</h2>
+                                <p class="mt-1 text-sm leading-6 text-gray-600">Edit the word and its translations</p>
 
-                        <h3 class="text-xl font-semibold mb-2">Translations:</h3>
+                                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                    <!-- Word Field -->
+                                    <div class="sm:col-span-4">
+                                        <label for="word" class="block text-sm font-medium leading-6 text-gray-900">Word</label>
+                                        <div class="mt-2">
+                                            <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                                <input type="text" name="word" id="word" autocomplete="word"
+                                                    class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                    value="{{ old('word', $word->word) }}" required>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        @foreach ($word->translations as $index => $translation)
-                            <div class="mb-4">
-                                <label for="translations[{{ $index }}][translation]" class="block text-gray-700">Translation</label>
-                                <input type="text" id="translations[{{ $index }}][translation]" name="translations[{{ $index }}][translation]" value="{{ old('translations.' . $index . '.translation', $translation->translation) }}" class="form-input mt-1 block w-full" required>
+                                    <!-- Existing Translations -->
+                                    <div class="sm:col-span-4">
+                                        <label class="block text-sm font-medium leading-6 text-gray-900">Translations</label>
+                                        <div class="mt-2 space-y-4">
+                                            @foreach ($word->translations as $index => $translation)
+                                                <div class="flex items-center gap-x-4">
+                                                    <select name="translations[{{ $index }}][language_id]"
+                                                            class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6">
+                                                        @foreach($languages as $language)
+                                                            <option value="{{ $language->id }}" {{ $language->id == $translation->language_id ? 'selected' : '' }}>
+                                                                {{ $language->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="text" name="translations[{{ $index }}][translation]"
+                                                           class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                           value="{{ old('translations.' . $index . '.translation', $translation->translation) }}"
+                                                           placeholder="Translation">
+                                                    <input type="hidden" name="translations[{{ $index }}][id]" value="{{ $translation->id }}">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
 
-                                <label for="translations[{{ $index }}][language_id]" class="block text-gray-700 mt-2">Language</label>
-                                <select id="translations[{{ $index }}][language_id]" name="translations[{{ $index }}][language_id]" class="form-select mt-1 block w-full" required>
-                                    @foreach ($languages as $language)
-                                        <option value="{{ $language->id }}" {{ $language->id == $translation->language_id ? 'selected' : '' }}>
-                                            {{ $language->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                    <!-- Add New Translation -->
+                                    <div class="sm:col-span-4">
+                                        <label for="new_translation" class="block text-sm font-medium leading-6 text-gray-900">Add New Translation</label>
+                                        <div class="mt-2 space-y-4">
+                                            <div class="flex items-center gap-x-4">
+                                                <select name="new_translation_language_id"
+                                                        class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6">
+                                                    <option value="">Select Language</option>
+                                                    @foreach($languages as $language)
+                                                        <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="text" name="new_translation"
+                                                       class="block flex-1 border-0 bg-transparent py-1.5 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                       placeholder="New Translation">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        @endforeach
-
-                        <!-- Поле для додавання нових перекладів -->
-                        <div id="new-translations">
-                            <!-- Тут можна додати JavaScript для динамічного додавання полів -->
                         </div>
 
-                        <div class="mb-4">
-                            <button type="submit" class="btn btn-primary">Update Word</button>
+                        <div class="mt-6 flex items-center justify-end gap-x-6">
+                            <a href="{{ route('words.index') }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
                         </div>
                     </form>
 
-                    <!-- JavaScript для додавання нових полів -->
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const newTranslationsContainer = document.getElementById('new-translations');
-                            const translations = @json($word->translations);
-                            const languages = @json($languages);
-
-                            function createTranslationField(index, existing = false) {
-                                const container = document.createElement('div');
-                                container.classList.add('mb-4');
-
-                                const translationLabel = document.createElement('label');
-                                translationLabel.setAttribute('for', `translations[${index}][translation]`);
-                                translationLabel.classList.add('block', 'text-gray-700');
-                                translationLabel.textContent = 'Translation';
-                                container.appendChild(translationLabel);
-
-                                const translationInput = document.createElement('input');
-                                translationInput.setAttribute('type', 'text');
-                                translationInput.setAttribute('id', `translations[${index}][translation]`);
-                                translationInput.setAttribute('name', `translations[${index}][translation]`);
-                                translationInput.classList.add('form-input', 'mt-1', 'block', 'w-full');
-                                if (existing) {
-                                    translationInput.value = translations[index].translation;
-                                }
-                                container.appendChild(translationInput);
-
-                                const languageLabel = document.createElement('label');
-                                languageLabel.setAttribute('for', `translations[${index}][language_id]`);
-                                languageLabel.classList.add('block', 'text-gray-700', 'mt-2');
-                                languageLabel.textContent = 'Language';
-                                container.appendChild(languageLabel);
-
-                                const languageSelect = document.createElement('select');
-                                languageSelect.setAttribute('id', `translations[${index}][language_id]`);
-                                languageSelect.setAttribute('name', `translations[${index}][language_id]`);
-                                languageSelect.classList.add('form-select', 'mt-1', 'block', 'w-full');
-
-                                languages.forEach(language => {
-                                    const option = document.createElement('option');
-                                    option.setAttribute('value', language.id);
-                                    option.textContent = language.name;
-                                    if (existing && language.id == translations[index].language_id) {
-                                        option.setAttribute('selected', 'selected');
-                                    }
-                                    languageSelect.appendChild(option);
-                                });
-
-                                container.appendChild(languageSelect);
-                                newTranslationsContainer.appendChild(container);
-                            }
-
-                            // Додати всі наявні переклади
-                            translations.forEach((translation, index) => {
-                                createTranslationField(index, true);
-                            });
-
-                            // Додати можливість додавання нових полів
-                            const addButton = document.createElement('button');
-                            addButton.textContent = 'Add Translation';
-                            addButton.classList.add('btn', 'btn-secondary', 'mt-4');
-                            addButton.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                const index = newTranslationsContainer.children.length;
-                                createTranslationField(index);
-                            });
-                            newTranslationsContainer.appendChild(addButton);
-                        });
-                    </script>
 
                 </div>
             </div>

@@ -32,26 +32,25 @@ class WordController extends Controller
      */
     public function store(Request $request)
     {
+
         $data = $request->validate([
             'word' => 'required|string|max:255',
             'translation' => 'required|string|max:255',
             'translation_language_id' => 'required|exists:languages,id',
         ]);
 
-        $word = new Word([
-            'word' => $data['word'],
+        $word = Word::create([
             'user_id' => auth()->id(),
+            'word' => $data['word'],
         ]);
 
-        $word->save();
-
-        $translation = new Translation([
+        $translation = Translation::create([
             'word_id' => $word->id,
-            'language_id' => $data['translation_language_id'],
+            'language_id' => $request->translation_language_id,
             'translation' => $data['translation'],
         ]);
 
-        $translation->save();
+        $word->languages()->attach($request->translation_language_id);
 
         return redirect()->route('words.index')->with('success', 'Word and translation created successfully');
     }
@@ -74,53 +73,25 @@ class WordController extends Controller
     public function edit(Word $word)
     {
         Gate::authorize('editWord', $word);
-        $languages = auth()->user()->languages;
-        $translation = $word->translations->first();
 
-        return view('words.edit', compact('word', 'languages', 'translation'));
+        $languages = auth()->user()->languages()->get(); // Отримання всіх мов
+
+        return view('words.edit', compact('word', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
+     /**
+     * Update a resource in storage.
      */
-    // public function update(Request $request, Word $word)
-    // {
-    //     $data = $request->validate([
-    //         'word' => 'required|string|max:255',
-    //         'translations' => 'nullable|array',
-    //         'translations.*.translation' => 'required|string|max:255',
-    //         'translations.*.language_id' => 'required|exists:languages,id',
-    //     ]);
-
-    //     // Оновлення слова
-    //     $word->update([
-    //         'word' => $data['word'],
-    //     ]);
-
-    //     // Видалення старих перекладів
-    //     $word->translations()->delete();
-
-    //     // Додавання нових перекладів
-    //     if (isset($data['translations'])) {
-    //         foreach ($data['translations'] as $translationData) {
-    //             Translation::create([
-    //                 'word_id' => $word->id,
-    //                 'language_id' => $translationData['language_id'],
-    //                 'translation' => $translationData['translation'],
-    //             ]);
-    //         }
-    //     }
-
-    //     return redirect()->route('words.index')->with('success', 'Word and translations updated successfully');
-    // }
-
     public function update(Request $request, Word $word)
     {
         $data = $request->validate([
             'word' => 'required|string|max:255',
-            'translations' => 'nullable|array',
-            'translations.*.translation' => 'required|string|max:255',
-            'translations.*.language_id' => 'required|exists:languages,id',
+            'translations' => 'array',
+            'translations.*.id' => 'nullable|exists:translations,id',
+            'translations.*.language_id' => 'required_with:translations|exists:languages,id',
+            'translations.*.translation' => 'required_with:translations|string|max:255',
+            'new_translation' => 'nullable|string|max:255',
+            'new_translation_language_id' => 'nullable|exists:languages,id',
         ]);
 
         // Оновлення слова
@@ -128,33 +99,33 @@ class WordController extends Controller
             'word' => $data['word'],
         ]);
 
-        // Збір ID мов, для яких потрібно додати нові переклади
-        $existingLanguageIds = $word->translations->pluck('language_id')->toArray();
-        $newLanguageIds = array_column($data['translations'], 'language_id');
-
-        // Видалення старих перекладів, якщо мова більше не вибрана
-        foreach ($word->translations as $translation) {
-            if (!in_array($translation->language_id, $newLanguageIds)) {
-                $translation->delete();
+        // Оновлення перекладів
+        if (isset($data['translations'])) {
+            foreach ($data['translations'] as $translationData) {
+                if (!empty($translationData['id'])) {
+                    // Оновлюємо існуючі переклади
+                    $translation = Translation::find($translationData['id']);
+                    if ($translation) {
+                        $translation->update([
+                            'language_id' => $translationData['language_id'],
+                            'translation' => $translationData['translation'],
+                        ]);
+                    }
+                }
             }
         }
 
-        // Додавання нових перекладів
-        foreach ($data['translations'] as $translationData) {
-            $translation = Translation::updateOrCreate(
-                [
-                    'word_id' => $word->id,
-                    'language_id' => $translationData['language_id'],
-                ],
-                [
-                    'translation' => $translationData['translation'],
-                ]
-            );
+        // Додаємо новий переклад
+        if (!empty($data['new_translation']) && !empty($data['new_translation_language_id'])) {
+            Translation::create([
+                'word_id' => $word->id,
+                'language_id' => $data['new_translation_language_id'],
+                'translation' => $data['new_translation'],
+            ]);
         }
 
         return redirect()->route('words.index')->with('success', 'Word and translations updated successfully');
     }
-
 
 
     /**
