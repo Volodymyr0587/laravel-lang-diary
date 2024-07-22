@@ -38,20 +38,18 @@ class PhraseController extends Controller
             'translation_language_id' => 'required|exists:languages,id',
         ]);
 
-        $phrase = new Phrase([
-            'phrase' => $data['phrase'],
+        $phrase = Phrase::create([
             'user_id' => auth()->id(),
+            'phrase' => $data['phrase'],
         ]);
 
-        $phrase->save();
-
-        $translation = new Translation([
+        $translation = Translation::create([
             'phrase_id' => $phrase->id,
-            'language_id' => $data['translation_language_id'],
+            'language_id' => $request->translation_language_id,
             'translation' => $data['translation'],
         ]);
 
-        $translation->save();
+        $phrase->languages()->attach($request->translation_language_id);
 
         return redirect()->route('phrases.index')->with('success', 'Phrase and translation created successfully');
     }
@@ -62,7 +60,10 @@ class PhraseController extends Controller
     public function show(Phrase $phrase)
     {
         Gate::authorize('editPhrase', $phrase);
-        return view('phrases.show', compact('phrase'));
+
+        $translations = $phrase->translations()->with('language')->get();
+
+        return view('phrases.show', compact('phrase', 'translations'));
     }
 
     /**
@@ -70,9 +71,11 @@ class PhraseController extends Controller
      */
     public function edit(Phrase $phrase)
     {
-        $languages = auth()->user()->languages;
-        $translation = $phrase->translations->first(); // Assuming one translation for simplicity
-        return view('phrases.edit', compact('phrase', 'languages', 'translation'));
+        Gate::authorize('editPhrase', $phrase);
+
+        $languages = auth()->user()->languages()->get();
+
+        return view('phrases.edit', compact('phrase', 'languages'));
     }
 
     /**
@@ -82,27 +85,41 @@ class PhraseController extends Controller
     {
         $data = $request->validate([
             'phrase' => 'required|string|max:255',
-            'translation' => 'required|string|max:255',
-            'translation_language_id' => 'required|exists:languages,id',
+            'translations' => 'array',
+            'translations.*.id' => 'nullable|exists:translations,id',
+            'translations.*.language_id' => 'required_with:translations|exists:languages,id',
+            'translations.*.translation' => 'required_with:translations|string|max:255',
+            'new_translation' => 'nullable|string|max:255',
+            'new_translation_language_id' => 'nullable|exists:languages,id',
         ]);
 
         $phrase->update([
             'phrase' => $data['phrase'],
         ]);
 
-        $translation = $phrase->translations->first(); // Assuming one translation for simplicity
-        if ($translation) {
-            $translation->update([
-                'translation' => $data['translation'],
-                'language_id' => $data['translation_language_id'],
-            ]);
-        } else {
-            $translation = new Translation([
+        // Оновлення перекладів
+        if (isset($data['translations'])) {
+            foreach ($data['translations'] as $translationData) {
+                if (!empty($translationData['id'])) {
+                    // Оновлюємо існуючі переклади
+                    $translation = Translation::find($translationData['id']);
+                    if ($translation) {
+                        $translation->update([
+                            'language_id' => $translationData['language_id'],
+                            'translation' => $translationData['translation'],
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Додаємо новий переклад
+        if (!empty($data['new_translation']) && !empty($data['new_translation_language_id'])) {
+            Translation::create([
                 'phrase_id' => $phrase->id,
-                'language_id' => $data['translation_language_id'],
-                'translation' => $data['translation'],
+                'language_id' => $data['new_translation_language_id'],
+                'translation' => $data['new_translation'],
             ]);
-            $translation->save();
         }
 
         return redirect()->route('phrases.index')->with('success', 'Phrase and translation updated successfully');
@@ -114,7 +131,9 @@ class PhraseController extends Controller
     public function destroy(Phrase $phrase)
     {
         Gate::authorize('editPhrase', $phrase);
+
         $phrase->delete();
+
         return redirect()->route('phrases.index')->with('success', 'Phrase deleted successfully');
     }
 }
