@@ -33,7 +33,7 @@
                                   <tr class="border-b border-neutral-200">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $loop->iteration }}</td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <a href="{{ route('phrases.show', $phrase) }}">{{ $phrase->phrase }}</a>
+                                        <a href="{{ route('phrases.show', $phrase) }}" class="font-bold text-lg underline hover:text-indigo-600">{{ $phrase->phrase }}</a>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <a href="{{ route('phrases.edit', $phrase) }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Edit</a>
