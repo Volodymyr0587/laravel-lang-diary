@@ -42,7 +42,7 @@
                                         <form action="{{ route('words.destroy', $word) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">Delete</button>
+                                            <button type="submit" onclick="return confirm('Are you sure?');" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">Delete</button>
                                         </form>
                                     </td>
                                   </tr>
