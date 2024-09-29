@@ -6,6 +6,7 @@ The Language Diary App is a web application built using Laravel that allows user
 
 ## Features
 
+- Authenticate with a Google account or email and password.
 - Language Management: Create, view, and manage languages.
 - Word Management: Create, view, and manage words.
 - Phrase Management: Create, view, and manage phrases.
